@@ -1,8 +1,6 @@
-from functools import lru_cache
 from fltk import *
 from time import sleep, time
 from random import randint, choice
-from functools import lru_cache
 import os
 chemin = os.path.dirname(os.path.abspath(__file__))+"\\data\\"
 
@@ -193,23 +191,30 @@ if __name__ == '__main__' :
                 datas[4].replace('color:','')))
         return resultlist
 
-    @lru_cache(maxsize=None)
-    def calcMinMaxXYForInChemin(ligne):
-        (sx,sy), (ex, ey) = ligne
-        minX = sx if sx < ex else ex
-        maxX = ex if sx < ex else sx
-        minY = sy if sy < ey else ey
-        maxY = ey if sy < ey else sy
-        return (minX, maxX, minY, maxY, sx, ex, sy, ey)
-
-    def InChemin(lst,x,y):
-        # Optimized version: avoid repeated int() calls and range() overhead
+    def InChemin(lst, x, y):
+        # Ultra-optimized: inline all operations, minimize function calls
         for ligne in lst:
-            (minX, maxX, minY, maxY, Startx, Endx, Starty, Endy) = calcMinMaxXYForInChemin(ligne)
+            (sx, sy), (ex, ey) = ligne
             
-            # Use direct comparison instead of range() - much faster
-            if minX <= x <= maxX and minY <= y <= maxY:
-                return int(Startx), int(Endx), int(Starty), int(Endy)
+            # Inline min/max with single comparison per axis
+            # This avoids function call overhead
+            if sx < ex:
+                if not (sx <= x <= ex):
+                    continue
+            else:
+                if not (ex <= x <= sx):
+                    continue
+            
+            if sy < ey:
+                if not (sy <= y <= ey):
+                    continue
+            else:
+                if not (ey <= y <= sy):
+                    continue
+            
+            # If we get here, point is in the ligne
+            return sx, ex, sy, ey
+        
         return None
 
     def DecrypteChemin(chemin):
