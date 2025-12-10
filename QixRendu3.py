@@ -192,12 +192,20 @@ if __name__ == '__main__' :
         return resultlist
 
     def InChemin(lst,x,y):
-        for ligne in lst :
-            startPos, EndPos = ligne
-            Startx, Starty = startPos
-            Endx, Endy = EndPos
-            if x in range(int(min(Startx,Endx)),int(max(Startx,Endx))+1) and y in range(int(min(Starty,Endy)),int(max(Starty,Endy))+1):
-                    return int(Startx), int(Endx), int(Starty), int(Endy)
+        # Optimized version: avoid repeated int() calls and range() overhead
+        for ligne in lst:
+            (Startx, Starty), (Endx, Endy) = ligne
+            
+            # Direct comparison is faster than range()
+            minX = Startx if Startx < Endx else Endx
+            maxX = Endx if Startx < Endx else Startx
+            minY = Starty if Starty < Endy else Endy
+            maxY = Endy if Starty < Endy else Starty
+            
+            # Use direct comparison instead of range() - much faster
+            if minX <= x <= maxX and minY <= y <= maxY:
+                return int(Startx), int(Endx), int(Starty), int(Endy)
+        return None
 
     def DecrypteChemin(chemin):
         if chemin != None:
@@ -1261,5 +1269,5 @@ if __name__ == '__main__' :
         if touche_pressee("Escape"):
             ferme_fenetre()
 
-        sleep(0.01)
+        # sleep(0.01)
         mise_a_jour()
