@@ -192,7 +192,6 @@ if __name__ == '__main__' :
         return resultlist
 
     def InChemin(lst, x, y):
-        # Ultra-optimized: inline all operations, minimize function calls
         for ligne in lst:
             (sx, sy), (ex, ey) = ligne
             
@@ -384,13 +383,71 @@ if __name__ == '__main__' :
         for i in range(0,len(polygone)-1):
             x1,y1 = polygone[i]
             x2,y2 = polygone[i+1]
-            for l in chemins:
+            for l in chemins[:]:  # Use slice to avoid modifying list while iterating
                 ((xc1,yc1),(xc2,yc2)) = l
-                if (x1,x2)==(xc1,xc2) or (x2,x1)==(xc1,xc2):
-                    if (y1,y2)==(yc1,yc2) or (y2,y1)==(yc1,yc2): 
-                        chemins.remove(l)
-                        oldchemins.append(l)
-                        break
+                
+                # Check if this segment is covered by the polygon segment
+                # Segments must be on the same line (same X for vertical, same Y for horizontal)
+                if x1 == x2:  # Vertical polygon segment
+                    if xc1 == xc2 == x1:  # Chemin segment is also vertical on same X
+                        # Check if chemin segment is within polygon segment bounds
+                        poly_min_y, poly_max_y = min(y1, y2), max(y1, y2)
+                        chem_min_y, chem_max_y = min(yc1, yc2), max(yc1, yc2)
+                        # If chemin segment is fully contained in polygon segment
+                        if poly_min_y <= chem_min_y and chem_max_y <= poly_max_y:
+                            chemins.remove(l)
+                            oldchemins.append(l)
+                elif y1 == y2:  # Horizontal polygon segment
+                    if yc1 == yc2 == y1:  # Chemin segment is also horizontal on same Y
+                        # Check if chemin segment is within polygon segment bounds
+                        poly_min_x, poly_max_x = min(x1, x2), max(x1, x2)
+                        chem_min_x, chem_max_x = min(xc1, xc2), max(xc1, xc2)
+                        # If chemin segment is fully contained in polygon segment
+                        if poly_min_x <= chem_min_x and chem_max_x <= poly_max_x:
+                            chemins.remove(l)
+                            oldchemins.append(l)
+        return chemins
+    
+    def _remove_dead_ends(chemins):
+        """Move dead-end segments to oldchemins (unusable paths)."""
+        
+        # Safety: need at least 4 segments to form a valid boundary
+        if len(chemins) <= 4:
+            return chemins
+        
+        # Keep removing dead-ends until none remain
+        max_iterations = 10
+        iteration = 0
+        
+        while iteration < max_iterations:
+            iteration += 1
+            
+            # Count connections per point
+            connections = {}
+            for segment in chemins:
+                (x1, y1), (x2, y2) = segment
+                connections[(x1, y1)] = connections.get((x1, y1), 0) + 1
+                connections[(x2, y2)] = connections.get((x2, y2), 0) + 1
+            
+            # Find dead-ends (segments with at least one endpoint having only 1 connection)
+            dead_ends = []
+            for seg in chemins:
+                if connections[seg[0]] == 1 or connections[seg[1]] == 1:
+                    dead_ends.append(seg)
+            
+            if not dead_ends:
+                break  # No more dead-ends
+            
+            # Safety: don't remove too many segments at once
+            if len(chemins) - len(dead_ends) < 4:
+                break  # Would leave less than 4 segments
+            
+            # Move dead-ends to oldchemins (mark as unusable)
+            for seg in dead_ends:
+                if seg in chemins:  # Double-check it's still there
+                    chemins.remove(seg)
+                    oldchemins.append(seg)
+        
         return chemins
 
     def ray_tracing(x,y,poly):
@@ -867,6 +924,9 @@ if __name__ == '__main__' :
                         # Add all valid BuildingPath segments to chemins
                         # (segments already validated during drawing, but double-check)
                         chemins += BuildingPath
+                        
+                        # NOW clean up any dead-ends (after all segments are added)
+                        chemins = _remove_dead_ends(chemins)
             
             DrawPolygone = []
             BuildingPath = []
