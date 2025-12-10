@@ -123,7 +123,7 @@ Problèmes rencontrés :
 -Pas encore implémenté le monde 2 joueurs
 -Pas de changement de vitesse du joueur (pose des problèmes de détection des chemins)
 -problème lors de la création d'un nombre trop conséquent de zones (ralentissement du jeu)
--problème lors de la création d'une zone sans sortir du chemin (crée une "fausse zone" qui pose ensuite problème dans les calculs de zone
+-problème lors de la création d'une zone sans sortir du chemin (crée une "fausse zone" qui pose ensuite problème dans les calculs de zone)
 
 
 
