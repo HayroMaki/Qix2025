@@ -1,0 +1,30 @@
+Function: InChemin at line 204
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   204                                               @profile
+   205                                               def InChemin(lst,x,y):
+   206                                                   # Optimized version: avoid repeated int() calls and range() overhead
+   207   8128146    5248910.9      0.6     24.3          for ligne in lst:
+   208   6883193    4367292.5      0.6     20.3              (Startx, Starty), (Endx, Endy) = ligne
+   209
+   210   6883193    5845660.1      0.8     27.1              (minX, maxX, minY, maxY) = calcMinMaxXYForInChemin(Startx, Endx, Starty, Endy)
+   211
+   212                                                       # Use direct comparison instead of range() - much faster
+   213   6883193    5191281.4      0.8     24.1              if minX <= x <= maxX and minY <= y <= maxY:    
+   214     14179      18602.5      1.3      0.1                  return int(Startx), int(Endx), int(Starty), int(Endy)
+   215   1244953     884450.4      0.7      4.1          return None
+
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   205                                               @profile
+   206                                               def InChemin(lst,x,y):
+   207                                                   # Optimized version: avoid repeated int() calls and range() overhead
+   208  11995428    7101277.2      0.6     29.6          for ligne in lst:
+   209  10494879    8843426.7      0.8     36.8              (minX, maxX, minY, maxY, Startx, Endx, Starty, Endy) = calcMinMaxXYForInChemin(ligne)
+   210
+   211                                                       # Use direct comparison instead of range() - much faster
+   212  10494879    7075728.4      0.7     29.5              if minX <= x <= maxX and minY <= y <= maxY:    
+   213     22160      24943.5      1.1      0.1                  return int(Startx), int(Endx), int(Starty), int(Endy)
+   214   1500549     978646.3      0.7      4.1          return None

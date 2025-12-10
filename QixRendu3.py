@@ -1,6 +1,8 @@
+from functools import lru_cache
 from fltk import *
 from time import sleep, time
 from random import randint, choice
+from functools import lru_cache
 import os
 chemin = os.path.dirname(os.path.abspath(__file__))+"\\data\\"
 
@@ -191,16 +193,19 @@ if __name__ == '__main__' :
                 datas[4].replace('color:','')))
         return resultlist
 
+    @lru_cache(maxsize=None)
+    def calcMinMaxXYForInChemin(ligne):
+        (sx,sy), (ex, ey) = ligne
+        minX = sx if sx < ex else ex
+        maxX = ex if sx < ex else sx
+        minY = sy if sy < ey else ey
+        maxY = ey if sy < ey else sy
+        return (minX, maxX, minY, maxY, sx, ex, sy, ey)
+
     def InChemin(lst,x,y):
         # Optimized version: avoid repeated int() calls and range() overhead
         for ligne in lst:
-            (Startx, Starty), (Endx, Endy) = ligne
-            
-            # Direct comparison is faster than range()
-            minX = Startx if Startx < Endx else Endx
-            maxX = Endx if Startx < Endx else Startx
-            minY = Starty if Starty < Endy else Endy
-            maxY = Endy if Starty < Endy else Starty
+            (minX, maxX, minY, maxY, Startx, Endx, Starty, Endy) = calcMinMaxXYForInChemin(ligne)
             
             # Use direct comparison instead of range() - much faster
             if minX <= x <= maxX and minY <= y <= maxY:
