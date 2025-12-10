@@ -1,0 +1,11 @@
+first-corner-x:595
+first-corner-y:120
+second-corner-x:605
+second-corner-y:730
+color:silver
+!
+first-corner-x:270
+first-corner-y:420
+second-corner-x:930
+second-corner-y:430
+color:silver

@@ -1,0 +1,5 @@
+DoQix:True
+QixSize:80
+QixSpeed:2
+SparxNumber:3
+GameHorizontalSpace:700
