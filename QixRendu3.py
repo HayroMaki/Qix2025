@@ -829,17 +829,35 @@ if __name__ == '__main__' :
             DrawMode = False
 
             DrawPolygone.append((PlayerX,PlayerY))
-            Poly,chemins = AdaptZone(DrawPolygone,chemins)
-            DrawPolygone.extend(Poly)
+            
+            # Check if we actually moved (avoid creating false tiny chemins)
+            # Calculate total distance moved
+            if len(DrawPolygone) >= 2:
+                start_point = DrawPolygone[0]
+                end_point = DrawPolygone[-1]
+                distance_moved = abs(start_point[0] - end_point[0]) + abs(start_point[1] - end_point[1])
+                
+                # Only process if we moved at least a minimum distance
+                if distance_moved >= vitesse * 2:  # At least 2 movement steps
+                    Poly,chemins = AdaptZone(DrawPolygone,chemins)
+                    DrawPolygone.extend(Poly)
 
-            SurfacePoly=Aire_polygone(DrawPolygone)
-            if SurfacePoly!=None:
-                SurfaceActuel+=SurfacePoly
+                    SurfacePoly=Aire_polygone(DrawPolygone)
+                    if SurfacePoly!=None:
+                        SurfaceActuel+=SurfacePoly
 
-                EntirePolygone.append(DrawPolygone)
+                        EntirePolygone.append(DrawPolygone)
 
-                BuildingPath.append(((PlayerX,PlayerY),(LastPointX,LastPointY)))
-                chemins += BuildingPath
+                        # Add the final segment from last point to current position
+                        final_segment = ((PlayerX,PlayerY),(LastPointX,LastPointY))
+                        final_seg_length = abs(PlayerX - LastPointX) + abs(PlayerY - LastPointY)
+                        if final_seg_length >= vitesse:
+                            BuildingPath.append(final_segment)
+                        
+                        # Add all valid BuildingPath segments to chemins
+                        # (segments already validated during drawing, but double-check)
+                        chemins += BuildingPath
+            
             DrawPolygone = []
             BuildingPath = []
 
@@ -899,11 +917,14 @@ if __name__ == '__main__' :
                 if sens0 != LastMove:
                     NewPointX = PlayerX
                     NewPointY = PlayerY
-                    BuildingPath.append(((NewPointX,NewPointY),(LastPointX,LastPointY)))
-                    DrawPolygone.append((LastPointX,LastPointY))
-                    DrawPolygone.append((NewPointX,NewPointY))
-                    LastPointX = NewPointX
-                    LastPointY = NewPointY
+                    # Only add segment if it has actual length
+                    seg_length = abs(NewPointX - LastPointX) + abs(NewPointY - LastPointY)
+                    if seg_length >= vitesse:
+                        BuildingPath.append(((NewPointX,NewPointY),(LastPointX,LastPointY)))
+                        DrawPolygone.append((LastPointX,LastPointY))
+                        DrawPolygone.append((NewPointX,NewPointY))
+                        LastPointX = NewPointX
+                        LastPointY = NewPointY
                 if sens0 == "Up":
                     PlayerY -= vitesse
                     LastMove = "Up"
