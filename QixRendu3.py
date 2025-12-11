@@ -9,6 +9,7 @@ if __name__ == '__main__' :
     ##### Variables #####
     largeurfenetre = 1200
     hauteurfenetre = 800
+    frequence = 100
     GameSpaceTaille = 600
     GameSpacex1 = (largeurfenetre//2)-(GameSpaceTaille//2)
     GameSpacey1 = 100
@@ -39,7 +40,7 @@ if __name__ == '__main__' :
         ((GameSpacex2,GameSpacey1),(GameSpacex2,GameSpacey2)),
         ((GameSpacex1,GameSpacey1),(GameSpacex1,GameSpacey2)),
         ((GameSpacex1,GameSpacey2),(GameSpacex2,GameSpacey2)),
-        ]
+    ]
     
     oldchemins = []
 
@@ -93,7 +94,7 @@ if __name__ == '__main__' :
     level=1
     #####################
 
-    cree_fenetre(largeurfenetre,hauteurfenetre)
+    cree_fenetre(largeurfenetre,hauteurfenetre,frequence)
     rectangle(0,0,largeurfenetre,hauteurfenetre,"black","black",)
     rectangle(GameSpacex1,GameSpacey1,GameSpacex2,GameSpacey2,"white",'',5)
 
