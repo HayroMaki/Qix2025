@@ -429,6 +429,29 @@ if __name__ == '__main__' :
             pol1x,pol1y = pol2x,pol2y
 
         return inside
+    
+    def IsInConqueredZone(x, y, conquered_zones):
+        # Check multiple points slightly offset inward to catch boundary cases
+        # where ray_tracing might miss points exactly on polygon edges
+        offsets = [
+            (0, 0),      # Center point
+            (1, 0),      # Slight right
+            (-1, 0),     # Slight left
+            (0, 1),      # Slight down
+            (0, -1),     # Slight up
+            (1, 1),      # Diagonal
+            (-1, -1),    # Diagonal
+        ]
+        
+        for poly in conquered_zones:
+            if len(poly) < 3:  # Skip invalid polygons
+                continue
+            
+            # Check if any of the offset points are inside
+            for dx, dy in offsets:
+                if ray_tracing(x + dx, y + dy, poly):
+                    return True
+        return False
         
     def Retire_doublons(lst):
         lst2 = []
@@ -843,14 +866,15 @@ if __name__ == '__main__' :
 
         # passage Draw Mode / Path Mod
         if ActivateDrawMode() == True and LastModewasDraw == False:
-            DrawMode = True
-            if InPath == True:
-                LastPointX = PlayerX
-                LastPointY = PlayerY
-            elif InPath != True:
-                LastPointX = LastPlayerX
-                LastPointY = LastPlayerY
-            DrawPolygone.append((LastPointX,LastPointY))
+            if not IsInConqueredZone(PlayerX, PlayerY, EntirePolygone):
+                DrawMode = True
+                if InPath == True:
+                    LastPointX = PlayerX
+                    LastPointY = PlayerY
+                elif InPath != True:
+                    LastPointX = LastPlayerX
+                    LastPointY = LastPlayerY
+                DrawPolygone.append((LastPointX,LastPointY))
 
         if InPath == True and LastModewasDraw == True :
             DrawMode = False
