@@ -409,47 +409,6 @@ if __name__ == '__main__' :
                             oldchemins.append(l)
         return chemins
     
-    def _remove_dead_ends(chemins):
-        """Move dead-end segments to oldchemins (unusable paths)."""
-        
-        # Safety: need at least 4 segments to form a valid boundary
-        if len(chemins) <= 4:
-            return chemins
-        
-        # Keep removing dead-ends until none remain
-        max_iterations = 10
-        iteration = 0
-        
-        while iteration < max_iterations:
-            iteration += 1
-            
-            # Count connections per point
-            connections = {}
-            for segment in chemins:
-                (x1, y1), (x2, y2) = segment
-                connections[(x1, y1)] = connections.get((x1, y1), 0) + 1
-                connections[(x2, y2)] = connections.get((x2, y2), 0) + 1
-            
-            # Find dead-ends (segments with at least one endpoint having only 1 connection)
-            dead_ends = []
-            for seg in chemins:
-                if connections[seg[0]] == 1 or connections[seg[1]] == 1:
-                    dead_ends.append(seg)
-            
-            if not dead_ends:
-                break  # No more dead-ends
-            
-            # Safety: don't remove too many segments at once
-            if len(chemins) - len(dead_ends) < 4:
-                break  # Would leave less than 4 segments
-            
-            # Move dead-ends to oldchemins (mark as unusable)
-            for seg in dead_ends:
-                if seg in chemins:  # Double-check it's still there
-                    chemins.remove(seg)
-                    oldchemins.append(seg)
-        
-        return chemins
 
     def ray_tracing(x,y,poly):
         n = len(poly)
@@ -923,11 +882,8 @@ if __name__ == '__main__' :
                             BuildingPath.append(final_segment)
                         
                         # Add all valid BuildingPath segments to chemins
-                        # (segments already validated during drawing, but double-check)
+
                         chemins += BuildingPath
-                        
-                        # NOW clean up any dead-ends (after all segments are added)
-                        chemins = _remove_dead_ends(chemins)
             
             DrawPolygone = []
             BuildingPath = []
