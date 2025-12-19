@@ -1,129 +1,68 @@
-Projet Qix - Jules/Khephren
+# Projet Qix
 
-	TOUCHES:
-Haut		-Flèche haut
-Bas		-Flèche bas
-Gauche		-Flèche Gauche
-Droite		-Flèche Droite
-Mode Dessin	-Espace
-Fermer		-Echap
+Prototype inspiré du jeu d'arcade **Qix** développé par Jules & Khephren. L'objectif est de capturer au moins 75 % de l'aire de jeu en traçant des lignes sans se faire toucher par le Qix (l'entité centrale) ni par les Sparx (ennemis circulant sur les chemins).
 
------------------------------------------
+## Gameplay en bref
 
-Organisation du code:
+1. Le joueur démarre sur le périmètre d'un carré (mode *chemin*).
+2. En appuyant sur la barre d'espace, il passe en mode *dessin* et trace une ligne à travers la zone vide.
+3. Dès qu'il referme son tracé sur un chemin existant, la zone coupée est remplie si le Qix ne s'y trouve pas.
+4. Trois vies permettent de survivre aux collisions avec le Qix, les Sparx ou son propre tracé.
+5. Trois niveaux successifs augmentent la difficulté (Qix plus gros/rapide, davantage de Sparx).
 
-Importation : 
-fltk *
-time(sleep,time)
-random(randint,choice)
-matplotlib (NON UTILISE, IMPORTE POUR DES TESTS)
+## Commandes
 
-Variables :
-il y en a beaucoup, mais elles sont réunies en blocs:
+| Action                | Touche                  |
+| --------------------- | ----------------------- |
+| Déplacer le joueur    | Flèches directionnelles |
+| Mode dessin           | Espace                  |
+| Quitter               | Échap                   |
 
-la fenetre et la zone de jeu
-le joueur (vie, déplacements, vitesse...)
-les chemins
-la surface
-le Qix
-les Sparx
-les obstacles
-autres(invincibilite,menu...)
+## Boucles principales
 
-Création de la fenetre et de la zone de jeu
+- **Menu** : permet d'activer les variantes (obstacles, bonus, configuration), de lancer une partie classique ou d'afficher l'option 2 joueurs (prototype non implémenté).
+- **Partie** : rafraîchit l'intégralité de la scène à chaque frame (chemins, zones, Qix, Sparx, bonus, etc.), vérifie la progression, gère les collisions et transitions de modes, et contrôle la montée de niveau.
 
-Fonctions :
-AfficheLife() 		Affiche la vie en haut de l'écran
-perdu()			Affiche un écran de défaite
-gagne()			Affiche un écran de victoire
-lvlup()			Affiche un écran de montée de niveau
-bouton()		Affiche les boutons du menu
-menu()			Affiche le menu
-Obstacle()		Affiche les obstacles
-SetObstacleMode()	Vérifie la présence d'un fichier d'obstacles
-ReadObstacleFile()	Lie le fichier d'obstacles et en renvoie la liste des obstacles
-InChemin()  		Vérifie l'appartenance de coordonnées xy à une liste de chemins
-DecrypteChemin()	Le rendu de InChemin est différent du format de la liste des chemins, cette fonction change cela
-direction()  		Regarde les touches préssées par le joueur
-Invert_direction()	renvoie la direction inverse à celle mise en paramètre
-ActivateDrawMode() 	Regarde le pressage de la touche espace
-AfficheLignes()		Affiche une liste de lignes (ex: chemins, tracé du joueur...)
-AfficheZone()		Affiche chaque polygone selon une liste de polygones
-testalldirect()		Test toutes les directions possibles sur les chemins
-testalldirect_oldchemins() Pareil, sur les anciens chemins (pour les Sparx sortis du chemin)
-Ini_Mat()		Initialise une matrice de la taille définie par les paramètres
-AfficheMat()		(utilisé pour les tests) - Affiche le contenu d'une matrice de manière propre
-diviseLigne()		Sépare un chemin en 2 et renvoie les 2 nouveaux chemins
-diviseLigne3()		Sépare un chemin en 3 et renvoie les 3 nouveaux chemins
-AdaptChemin()		Utilise les diviseLigne pour adapter le chemin apres la prise d'une zone
-ray_tracing()		Vérifie l'appartenance d'un point à un polygone via une méthode de ray tracing
-retire_doublons()	retire les doublons d'une liste
-AdaptZone() 		Utilise le ray_tracing et Adapt_chemin pour s'occuper de tout ce qu'il faut faire lors de la capture de zone
-Qix()			Affiche le Qix par rapport à ses coordonnées et sa taille
-Sparx()			Affiche le Sparx par rapport à ses coordonnées et sa taille
-Respawn()		Renvoie les coordonnées du centre d'un chemin existant aléatoire pour faire réaparraitre le joueur
-Aire_Polygone()		Renvoie la surface d'un polygone
-Creer_bonus()		Crée une liste de bonus aléatoirements placés sur la zone de jeu
-SetBonusMode()		Vérifie la présence d'un fichier de bonus
-ReadBonusFile()		Lie le fichier de bonus et en renvoie la liste des bonus
-Affiche_bonus()		Affiche l'ensemble des bonus de la liste en paramètre
-mange_bonus()		vérifie si un joueur mange un bonus et le retire de la liste si oui
-SetConfigMode()		Vérifie la présence d'un fichier de configuration initiale
-ReadConfigFile()	Lie le fichier de configuration et change les différentes variables concernées (taille et vitesse initiales du Qix, nombre initial de Sparxs et taille de la zone de jeu.
+## Variantes & options
 
+- **Obstacles** : chargés depuis `data/obstacles.txt` ou générés aléatoirement. Ils bloquent le joueur pendant le mode dessin.
+- **Bonus** : issus de `data/bonus.txt` ou générés aléatoirement. Les bonus rendent le joueur temporairement invincible.
+- **Configuration** : le fichier `data/config.txt` ajuste la taille/vitesse du Qix, le nombre de Sparx et la taille initiale de la zone jouable.
+- **Mode 2 joueurs** : interface présente mais gameplay non implémenté.
 
-Boucle Menu :
-Permet de choisir le mode de jeu (2 joueurs non implémenté), les variantes (obstacles, bonus, config) ou quitter le jeu
+## Architecture du code
 
-Change les paramètres initiales selon le fichier config (si choisi)
-Crée les obstacles (aléatoirement ou selon le fichier obstacle) (si choisi)
-Crée les sparx selon le nombre
-Crée les bonus (aléatoirement ou selon le fichier bonus) (si choisi)
+Tout le gameplay est regroupé dans `QixRendu3.py` et s'appuie sur la bibliothèque `fltk` pour l'affichage. Les principales catégories de fonctions sont :
 
-Boucle Principale :
-Vérification de condition de victoire/passage au niveau supèrieur 
-(3 niveaux augmentant en difficulté : + de sparx, Qix plus gros et plus rapide)
+- **Affichage** : rendu de la fenêtre, polygones, Qix, Sparx, bonus, HUD (vie, score, surface capturée).
+- **Gestion d'état** : bascule entre modes chemin/dessin, suivi des chemins, stockage des zones capturées, calcul d'aires.
+- **IA ennemies** : déplacement pseudo-aléatoire du Qix avec rebonds sur les chemins, suivi des chemins et reconnection pour les Sparx.
+- **Systèmes auxiliaires** : lecture des fichiers de données, génération de bonus/obstacles, adaptation des chemins après capture, ray tracing pour déterminer l'appartenance des points.
 
-effacage et réaffichage de chaque élément (zone de jeu, chemins, vie, joueur, surface, Qix...)
+## Données & ressources
 
-Passage du mode chemin au mode dessin et inversement
---(si le joueur était en mode dessin à la dernière boucle et touche un chemin il repasse en mode chemin)
---Calcul de la zone capturé selon l'emplacement du Qix
+```
+data/
+ ├─ config.txt      # paramètres initiaux (taille/vitesse du Qix, nb de Sparx, taille de zone)
+ ├─ obstacles.txt   # obstacles prédéfinis
+ └─ bonus.txt       # bonus prédéfinis
+```
 
-Gestion des déplacements, de l'affichage et s'assurer que le joueur reste dans le chemin en mode chemin
+Ces fichiers sont facultatifs : si un fichier est absent, le jeu bascule automatiquement sur une génération aléatoire ou une configuration par défaut.
 
-Gestion des déplacements et de l'affichage du joueur en mode dessin
---contient la vérification en cas de croisement de son dessin (-1vie, respawn ou fin si vie à 0)
+## Dépendances & exécution
 
-Gestion du Qix
---déplacement aléatoire
---empeche de passer outre un chemin
---détecte la collision avec le dessin et conséquences(-1vie, respawn ou fin si vie à 0)
+1. Créer et activer un environnement virtuel (facultatif).
+2. S'assurer que la bibliothèque `fltk` est installée.
+3. Lancer le jeu :
+   ```bash
+   python3 QixRendu3.py
+   ```
 
-Gestion des Sparx
---déplacements sur les chemins
---si plus sur un chemin, continue sur les anciens chemins jusqu'à retrouver le chemin principal
---détecte la collision avec le jouer et conséquences(-1vie, respawn ou fin si vie à 0)
+Le script charge les fichiers présents dans `data/` puis ouvre directement la fenêtre de jeu.
 
-Obstacles
---bloquent le joueur
+## Problèmes connus / pistes d'amélioration
 
-Bonus
---Si mangé, rends le joueur invicible: ignore les sparx, et pas de vie retirée si collision avec le Qix pendant quelques secondes.
-
-Empeche le joueur de sortir des limites de la zone de jeu
-
-Fermeture de la fenetre si touche Echap pressée.
-
------------------------------------------
-
-Problèmes rencontrés :
--Pas encore implémenté "l'anti-afk"
- (qui apparait lorsqu'on est trop longtemps immobile en mode dessin)
--Pas encore implémenté le monde 2 joueurs
--Pas de changement de vitesse du joueur (pose des problèmes de détection des chemins)
--problème lors de la création d'un nombre trop conséquent de zones (ralentissement du jeu)
--problème lors de la création d'une zone sans sortir du chemin (crée une "fausse zone" qui pose ensuite problème dans les calculs de zone)
-
-
-
+- Système anti-AFK en mode dessin non implémenté (on peut s'arrêter de bouger sans pénalités).
+- Mode 2 joueurs uniquement esquissé.
+- Vitesse du joueur fixe : modifier ce paramètre provoque actuellement des soucis de détection des chemins.
