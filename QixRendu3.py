@@ -2,7 +2,7 @@ from fltk import *
 from time import sleep, time
 from random import randint, choice
 import os
-chemin = os.path.dirname(os.path.abspath(__file__))+"\\data\\"
+chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data") + os.sep
 
 if __name__ == '__main__' :
 
